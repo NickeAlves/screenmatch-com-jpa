@@ -4,7 +4,6 @@ import br.com.alura.screenmatch.model.*;
 import br.com.alura.screenmatch.repository.SerieRepository;
 import br.com.alura.screenmatch.service.ConsumoApi;
 import br.com.alura.screenmatch.service.ConverteDados;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -15,7 +14,7 @@ public class Principal {
     private ConsumoApi consumo = new ConsumoApi();
     private ConverteDados conversor = new ConverteDados();
     private final String ENDERECO = "https://www.omdbapi.com/?t=";
-    private final String API_KEY = "&apikey=6585022c";
+    private final String API_KEY_OMDB = System.getenv("API_KEY_OMDB");
     private List<DadosSerie> dadosSeries = new ArrayList<>();
 
     private SerieRepository repository;
@@ -32,7 +31,7 @@ public class Principal {
         while (opcao != 0) {
 
             var menu = """
-                    
+                                        
                     1 - Buscar séries
                     2 - Buscar episódios
                     3 - Listar séries buscadas
@@ -44,7 +43,7 @@ public class Principal {
                     9 - Buscar episódio por trecho
                     10 - Top 5 episodios por série
                     11 - Buscar episódios a partir de uma data
-                    
+                                        
                     0 - Sair
                     """;
 
@@ -105,12 +104,12 @@ public class Principal {
     private DadosSerie getDadosSerie() {
         System.out.println("Digite o nome da série para busca");
         var nomeSerie = leitura.nextLine();
-        var json = consumo.obterDados(ENDERECO + nomeSerie.replace(" ", "+") + API_KEY);
+        var json = consumo.obterDados(ENDERECO + nomeSerie.replace(" ", "+") + API_KEY_OMDB);
         DadosSerie dados = conversor.obterDados(json, DadosSerie.class);
         return dados;
     }
 
-    private void buscarEpisodioPorSerie(){
+    private void buscarEpisodioPorSerie() {
         listaSeriesBuscadas();
         System.out.print("Esolha uma série pelo nome: ");
         var nomeSerie = leitura.nextLine();
@@ -123,7 +122,7 @@ public class Principal {
             List<DadosTemporada> temporadas = new ArrayList<>();
 
             for (int i = 1; i <= serieEncontrada.getTotalTemporadas(); i++) {
-                var json = consumo.obterDados(ENDERECO + serieEncontrada.getTitulo().replace(" ", "+") + "&season=" + i + API_KEY);
+                var json = consumo.obterDados(ENDERECO + serieEncontrada.getTitulo().replace(" ", "+") + "&season=" + i + API_KEY_OMDB);
                 DadosTemporada dadosTemporada = conversor.obterDados(json, DadosTemporada.class);
                 temporadas.add(dadosTemporada);
             }
@@ -139,7 +138,8 @@ public class Principal {
             System.out.println("Serie não encontrada!");
         }
     }
-    private void listaSeriesBuscadas(){
+
+    private void listaSeriesBuscadas() {
         series = repository.findAll();
         series.stream()
                 .sorted(Comparator.comparing(Serie::getGenero))
@@ -164,7 +164,7 @@ public class Principal {
         System.out.print("Avaliações a partir de que valor (0 - 10)? ");
         var avaliacao = leitura.nextDouble();
 
-        List <Serie> seriesEncontradas = repository
+        List<Serie> seriesEncontradas = repository
                 .findByAtoresContainingIgnoreCaseAndAvaliacaoGreaterThanEqual(nomeDoAtor, avaliacao);
         System.out.println("Séries em que " + nomeDoAtor + " trabalhou: ");
         seriesEncontradas.forEach(s -> System.out.println(s.getTitulo()

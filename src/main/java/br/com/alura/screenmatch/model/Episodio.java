@@ -1,7 +1,6 @@
 package br.com.alura.screenmatch.model;
 
 import jakarta.persistence.*;
-import org.intellij.lang.annotations.MagicConstant;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
@@ -19,6 +18,7 @@ public class Episodio {
     private LocalDate dataLancamento;
     @ManyToOne
     private Serie serie;
+
     public Episodio() {}
 
     public Episodio(Integer numeroTemporada, DadosEpisodio dadosEpisodio) {
@@ -101,6 +101,6 @@ public class Episodio {
                 ", titulo='" + titulo + '\'' +
                 ", numeroEpisodio=" + numeroEpisodio +
                 ", avaliacao=" + avaliacao +
-                ", dataLancamento=" + dataLancamento ;
+                ", dataLancamento=" + dataLancamento;
     }
 }
